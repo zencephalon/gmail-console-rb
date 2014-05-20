@@ -73,7 +73,12 @@ class GmailModel
   end
 
   def latest_emails(num, skip = 0)
-    @gmail.inbox.emails(:all).reverse[skip..(skip+num)]
+    @emails = @gmail.inbox.emails(:all).reverse
+    @emails[skip..(skip+num)]
+  end
+
+  def get_email(num)
+    @emails[num]
   end
 
   def logged_in?
