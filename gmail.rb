@@ -1,18 +1,25 @@
 require 'highline/import'
 require 'gmail'
 
-module Views
-  def self.login
+class Views
+  def initialize(controller)
+    @controller = controller
+  end
+
+  def login
     username = HighLine.ask("Username: ")
     password = HighLine.ask("Password: ") { |q| q.echo = '*' }
-    Controller.authenticate(username, password)
+    @controller.authenticate(username, password)
   end
 end
 
 class Controller
+  def initialize
+    @views = Views.new(self)
+  end
 
   def home
-    Views.login
+    @views.login
   end
 
   def authenticate(username, password)
