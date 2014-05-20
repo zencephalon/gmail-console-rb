@@ -15,17 +15,27 @@ class Views
   def mailbox(emails, n)
     num = n
     emails.each do |mail|
-      puts "#{num.to_s.ljust(2)}. #{mail[:subject]}"
+      print_subject(mail[:subject], num)
       num += 1
     end
 
-    next_action = HighLine.ask("> or q or #: ")
-    @controller.mailbox(n, next_action)
+    get_next_action(n)
   end
 
-  def email(mail)
-    puts mail[:subject]
+  def email(mail, n)
+    print_subject(mail[:subject], n)
     puts mail[:body]
+
+    get_next_action(n)
+  end
+
+  def print_subject(subject, n)
+    puts "#{n.to_s.ljust(2)}. #{subject}"
+  end
+
+  def get_next_action(n)
+    next_action = HighLine.ask("> or q or #: ")
+    @controller.mailbox(n, next_action)
   end
 end
 
@@ -40,7 +50,7 @@ class Controller
   def email(n)
     email = @gm.get_email(n)
     email = {subject: email.subject, body: email.message.text_part.body}
-    @views.email(email)
+    @views.email(email, n)
   end
 
   def mailbox(n = 0, action = nil)
