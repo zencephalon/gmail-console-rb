@@ -12,12 +12,15 @@ class Views
     @controller.authenticate(username, password)
   end
 
-  def mailbox(emails)
-    num = 1
+  def mailbox(emails, n)
+    num = n
     emails.each do |mail|
       puts "#{num.to_s.ljust(2)}. #{mail[:subject]}"
       num += 1
     end
+
+    next_action = HighLine.ask("> or q: ")
+    @controller.mailbox(n, next_action)
   end
 end
 
@@ -29,10 +32,16 @@ class Controller
     @gm = GmailModel.new
   end
 
-  def mailbox
-    emails = @gm.latest_emails(20)
-    emails.map! {|email| {subject: email.subject}}
-    @views.mailbox(emails)
+  def mailbox(n = 0, action = nil)
+    if action.nil?
+      emails = @gm.latest_emails(20, n)
+      emails.map! {|email| {subject: email.subject}}
+      @views.mailbox(emails, n)
+    elsif action == 'q'
+      exit
+    elsif action == '>'
+      mailbox(n + 20)
+    end
   end
 
   def login
@@ -63,8 +72,8 @@ class GmailModel
     @gmail.login
   end
 
-  def latest_emails(num)
-    @gmail.inbox.emails(:all).reverse.take(10)
+  def latest_emails(num, skip = 0)
+    @gmail.inbox.emails(:all).reverse[skip..(skip+num)]
   end
 
   def logged_in?
