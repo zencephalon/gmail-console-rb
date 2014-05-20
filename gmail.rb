@@ -122,5 +122,4 @@ class GmailModel
 end
 
 controller = Controller.new
-p controller.gm
 controller.home
