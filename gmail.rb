@@ -13,6 +13,8 @@ class Views
   end
 
   def mailbox(emails, n)
+    clear_screen
+
     num = n
     emails.each do |mail|
       print_subject(mail[:subject], num)
@@ -23,10 +25,16 @@ class Views
   end
 
   def email(mail, n)
+    clear_screen
+
     print_subject(mail[:subject], n)
     puts mail[:body]
 
     get_next_action(n)
+  end
+
+  def clear_screen
+    puts "\e[H\e[2J"
   end
 
   def print_subject(subject, n)
@@ -93,10 +101,10 @@ class GmailModel
   def authenticate(username, password)
     @gmail = Gmail.new(username, password)
     @gmail.login
+    @emails = @gmail.inbox.emails(:all).reverse
   end
 
   def latest_emails(num, skip = 0)
-    @emails = @gmail.inbox.emails(:all).reverse
     @emails[skip..(skip+num)]
   end
 
